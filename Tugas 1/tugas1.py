@@ -145,7 +145,6 @@ def ip_on_binary_rep(binary_representation):
     return ip_result_str
 
 def keyToBinary(key_input):
-    # key disini dapat diubah, jika key diubah maka cipher text yang dihasilkan akan berbeda dari sebelumnya
     original_key = key_input
     binary_representation_key = ''
     
