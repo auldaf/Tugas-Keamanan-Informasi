@@ -1,5 +1,5 @@
 #initail permutation
-ip_table = [
+IP = [
     58, 50, 42, 34, 26, 18, 10, 2,
     60, 52, 44, 36, 28, 20, 12, 4,
     62, 54, 46, 38, 30, 22, 14, 6,
@@ -10,7 +10,7 @@ ip_table = [
     63, 55, 47, 39, 31, 23, 15, 7
 ]
 # PC1 permutation table
-pc1_table = [
+PC_1 = [
     57, 49, 41, 33, 25, 17, 9, 1,
     58, 50, 42, 34, 26, 18, 10, 2,
     59, 51, 43, 35, 27, 19, 11, 3,
@@ -35,7 +35,7 @@ pc2_table = [
     34, 53, 46, 42, 50, 36, 29, 32
 ]
 #expension
-e_box_table = [
+e_box = [
     32, 1, 2, 3, 4, 5,
     4, 5, 6, 7, 8, 9,
     8, 9, 10, 11, 12, 13,
@@ -47,7 +47,7 @@ e_box_table = [
 ]
 
 # tabel s-box untuk enkripsi sebanyak 8
-s_boxes = [
+s_box = [
     # S-box 1
     [
         [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
@@ -119,26 +119,26 @@ ip_inverse_table = [
 ]
 
 def stringToBinary(user_input):
-        binary_representation = ''
+        binaryRepresent = ''
         for char in user_input:
             binary_char = format(ord(char), '08b')
-            binary_representation += binary_char
-            binary_representation = binary_representation[:64]
+            binaryRepresent += binary_char
+            binaryRepresent = binaryRepresent[:64]
         
-        binary_representation = binary_representation[:64].ljust(64, '0')
+        binaryRepresent = binaryRepresent[:64].ljust(64, '0')
          
-        return binary_representation
+        return binaryRepresent
     
 def binaryToASCII(binary_str):
     ascii_str = ''.join([chr(int(binary_str[i:i+8], 2)) for i in range(0, len(binary_str), 8)])
     return ascii_str
 
-def ip_on_binary_rep(binary_representation):
+def ip_on_binary_rep(binaryRepresent):
     
     ip_result = [None] * 64
     
     for i in range(64):
-        ip_result[i] = binary_representation[ip_table[i] - 1]
+        ip_result[i] = binaryRepresent[IP[i] - 1]
 
     ip_result_str = ''.join(ip_result)
     
@@ -146,25 +146,25 @@ def ip_on_binary_rep(binary_representation):
 
 def keyToBinary(key_input):
     original_key = key_input
-    binary_representation_key = ''
+    binaryRepresent_key = ''
     
     for char in original_key:
     # ubah char ke binary
         binary_key = format(ord(char), '08b') 
-        binary_representation_key += binary_key
+        binaryRepresent_key += binary_key
 
-    # print(binary_representation_key)
-    return binary_representation_key
+    # print(binaryRepresent_key)
+    return binaryRepresent_key
 
 def generate_round_keys(key_input):
     
     # key nya digantit ke binary
-    binary_representation_key = keyToBinary(key_input)
-    pc1_key_str = ''.join(binary_representation_key[bit - 1] for bit in pc1_table)
+    binaryRepresent_key = keyToBinary(key_input)
+    PC_1_keyString = ''.join(binaryRepresent_key[bit - 1] for bit in PC_1)
 
     
-    c0 = pc1_key_str[:28]
-    d0 = pc1_key_str[28:]
+    c0 = PC_1_keyString[:28]
+    d0 = PC_1_keyString[28:]
     round_keys = []
     for round_num in range(16):
         c0 = c0[shift_schedule[round_num]:] + c0[:shift_schedule[round_num]]
@@ -190,16 +190,16 @@ def encryption(user_input,key_input):
 
 
     for round_num in range(16):
-        expanded_result = [rpt[i - 1] for i in e_box_table]
+        result_expand = [rpt[i - 1] for i in e_box]
 
-        expanded_result_str = ''.join(expanded_result)
+        result_expand_str = ''.join(result_expand)
 
         round_key_str = round_keys[round_num]
 
 
         xor_result_str = ''
         for i in range(48):
-            xor_result_str += str(int(expanded_result_str[i]) ^ int(round_key_str[i]))
+            xor_result_str += str(int(result_expand_str[i]) ^ int(round_key_str[i]))
 
 
         six_bit_groups = [xor_result_str[i:i+6] for i in range(0, 48, 6)]
@@ -210,7 +210,7 @@ def encryption(user_input,key_input):
             row_bits = int(six_bit_groups[i][0] + six_bit_groups[i][-1], 2)
             col_bits = int(six_bit_groups[i][1:-1], 2)
 
-            s_box_value = s_boxes[i][row_bits][col_bits]
+            s_box_value = s_box[i][row_bits][col_bits]
             
             s_box_substituted += format(s_box_value, '04b')
 
@@ -253,14 +253,14 @@ def decryption(final_cipher,key_input):
     rpt = ip_dec_result_str[32:]
 
     for round_num in range(16):
-        expanded_result = [rpt[i - 1] for i in e_box_table]
+        result_expand = [rpt[i - 1] for i in e_box]
     
-        expanded_result_str = ''.join(expanded_result)
+        result_expand_str = ''.join(result_expand)
         round_key_str = round_keys[15-round_num]
     
         xor_result_str = ''
         for i in range(48):
-            xor_result_str += str(int(expanded_result_str[i]) ^ int(round_key_str[i]))
+            xor_result_str += str(int(result_expand_str[i]) ^ int(round_key_str[i]))
     
         six_bit_groups = [xor_result_str[i:i+6] for i in range(0, 48, 6)]
     
@@ -271,7 +271,7 @@ def decryption(final_cipher,key_input):
             col_bits = int(six_bit_groups[i][1:-1], 2)
     
 
-            s_box_value = s_boxes[i][row_bits][col_bits]
+            s_box_value = s_box[i][row_bits][col_bits]
             s_box_substituted += format(s_box_value, '04b')
     
  
